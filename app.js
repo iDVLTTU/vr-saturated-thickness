@@ -16,9 +16,12 @@ idv.vr = idv.vr || function(){
             FAR = 20000;
         this.camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
 
-        this.controls = new THREE.FirstPersonControls( camera );
-        this.controls.movementSpeed = 1000;
-        this.controls.lookSpeed = 0.1;
+        // this.controls = new THREE.FirstPersonControls( camera );
+        // this.controls.movementSpeed = 1000;
+        // this.controls.lookSpeed = 0.1;
+        this.controls = new THREE.OrbitControls( camera );
+        controls.target.set( 0.0, 100.0, 0.0 );
+        controls.userPanSpeed = 100;
 
         this.scene = new THREE.Scene();
         this.renderer = null;
@@ -52,7 +55,7 @@ idv.vr.onWindowResize = function () {
     camera.updateProjectionMatrix();
     renderer.setSize( window.innerWidth, window.innerHeight );
 
-    controls.handleResize();
+    // controls.handleResize();
 };
 
 
@@ -224,7 +227,12 @@ idv.vr.play = function () {
         data2D = idv.vr.generateHeight(idv.vr.getWorldWidth(), idv.vr.getWorldDepth());
 
         // update camera position
-        camera.position.y = data2D[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
+
+        controls.target.y = data2D[ worldHalfWidth + worldHalfDepth * worldWidth ] + 500;
+        camera.position.y =  controls.target.y + 2000;
+        camera.position.x = 2000;
+
+        // camera.position.y = data2D[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
 
         // create texture
         idv.vr.createTexture(data2D);
