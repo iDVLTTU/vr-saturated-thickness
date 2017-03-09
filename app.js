@@ -9,21 +9,11 @@ idv.vr = idv.vr || function(){
         this.worldWidth = 256;
         this.worldDepth = 256;
 
-        // position
-        var VIEW_ANGLE = 60,
-            ASPECT = window.innerWidth / window.innerHeight,
-            NEAR = 1,
-            FAR = 20000;
-        this.camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
-
-        // this.controls = new THREE.FirstPersonControls( camera );
-        // this.controls.movementSpeed = 1000;
-        // this.controls.lookSpeed = 0.1;
-        this.controls = new THREE.OrbitControls( camera );
-        controls.target.set( 0.0, 100.0, 0.0 );
-        controls.userPanSpeed = 100;
-
         this.scene = new THREE.Scene();
+
+
+
+
         this.renderer = null;
         this.worldHalfWidth = this.worldWidth / 2;
         this.worldHalfDepth = this.worldDepth / 2;
@@ -58,6 +48,23 @@ idv.vr.onWindowResize = function () {
     // controls.handleResize();
 };
 
+idv.vr.setupCamera = function () {
+    // CAMERA
+    var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
+    var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
+    camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
+    scene.add(camera);
+    camera.position.set(0,150,400);
+    camera.lookAt(scene.position);
+
+
+    // this.controls = new THREE.FirstPersonControls( camera );
+    // this.controls.movementSpeed = 1000;
+    // this.controls.lookSpeed = 0.1;
+    this.controls = new THREE.OrbitControls( camera );
+    this.controls.target.set( 0.0, 100.0, 0.0 );
+    this.controls.userPanSpeed = 100;
+};
 
 idv.vr.render = function () {
     controls.update( clock.getDelta() );
@@ -227,6 +234,8 @@ idv.vr.play = function () {
         data2D = idv.vr.generateHeight(idv.vr.getWorldWidth(), idv.vr.getWorldDepth());
 
         // update camera position
+        // position
+        idv.vr.setupCamera();
 
         controls.target.y = data2D[ worldHalfWidth + worldHalfDepth * worldWidth ] + 500;
         camera.position.y =  controls.target.y + 2000;
