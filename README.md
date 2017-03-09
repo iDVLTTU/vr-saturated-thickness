@@ -6,6 +6,6 @@ https://github.com/iDataVisualizationLab/SaturatedThickness
 
 ## REFERENCE
 
-Jos Dirksen, Learning Three.js : The JavaScript 3D Library for WebGL, 2013
+Text book: Jos Dirksen, Learning Three.js : The JavaScript 3D Library for WebGL, 2013
 
 
