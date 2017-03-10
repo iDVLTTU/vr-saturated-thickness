@@ -10,11 +10,8 @@ idv.vr = idv.vr || function(){
         this.worldDepth = 256;
 
         this.scene = new THREE.Scene();
+        this.renderer = new THREE.WebGLRenderer();
 
-
-
-
-        this.renderer = null;
         this.worldHalfWidth = this.worldWidth / 2;
         this.worldHalfDepth = this.worldDepth / 2;
         this.clock = new THREE.Clock();
@@ -48,7 +45,7 @@ idv.vr.onWindowResize = function () {
     // controls.handleResize();
 };
 
-idv.vr.setupCamera = function () {
+idv.vr.setupCamera = function (data2D) {
     // CAMERA
     var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
     var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
@@ -57,17 +54,30 @@ idv.vr.setupCamera = function () {
     camera.position.set(0,150,400);
     camera.lookAt(scene.position);
 
+    camera.position.x = 2000;
 
+    this.controls = new THREE.OrbitControls( camera );
+
+    camera.position.y =  idv.vr.controls.target.y + 2000;
+
+   // camera.position.y = data2D[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
+
+    // track ball control
+    // this.controls = new THREE.TrackballControls( camera, renderer.domElement );
+
+
+    // first personc ontrol
     // this.controls = new THREE.FirstPersonControls( camera );
     // this.controls.movementSpeed = 1000;
     // this.controls.lookSpeed = 0.1;
-    this.controls = new THREE.OrbitControls( camera );
+
+    // orbit control
     this.controls.target.set( 0.0, 100.0, 0.0 );
     this.controls.userPanSpeed = 100;
 };
 
 idv.vr.render = function () {
-    controls.update( clock.getDelta() );
+    this.controls.update();
     renderer.render( scene, camera );
 };
 
@@ -132,6 +142,74 @@ idv.vr.createContourMesh = function (width, height, material, data2D) {
 
     return new THREE.Mesh( geometry, material );
 
+
+
+//     var zFuncText = "x^2 - y^2";
+//     var zFunc = Parser.parse(zFuncText).toJSFunction( ['x','y'] );
+//
+// // parameters for the equations
+//     var a = 0.01, b = 0.01, c = 0.01, d = 0.01;
+//
+//     var meshFunction;
+//     var segments = 20,
+//         xMin = -10, xMax = 10, xRange = xMax - xMin,
+//         yMin = -10, yMax = 10, yRange = yMax - yMin,
+//         zMin = -10, zMax = 10, zRange = zMax - zMin;
+//
+//     xRange = xMax - xMin;
+//     yRange = yMax - yMin;
+//     zFunc = Parser.parse(zFuncText).toJSFunction( ['x','y'] );
+//     meshFunction = function(x, y)
+//     {
+//         x = xRange * x + xMin;
+//         y = yRange * y + yMin;
+//         var z = zFunc(x,y); //= Math.cos(x) * Math.sqrt(y);
+//         if ( isNaN(z) )
+//             return new THREE.Vector3(0,0,0); // TODO: better fix
+//         else
+//             return new THREE.Vector3(x, y, z);
+//     };
+//
+//     // true => sensible image tile repeat...
+//     var graphGeometry = new THREE.ParametricGeometry( meshFunction, segments, segments, true );
+//
+//     ///////////////////////////////////////////////
+//     // calculate vertex colors based on Z values //
+//     ///////////////////////////////////////////////
+//     graphGeometry.computeBoundingBox();
+//     zMin = graphGeometry.boundingBox.min.z;
+//     zMax = graphGeometry.boundingBox.max.z;
+//     zRange = zMax - zMin;
+//     var color, point, face, numberOfSides, vertexIndex;
+//     // faces are indexed using characters
+//     var faceIndices = [ 'a', 'b', 'c', 'd' ];
+//     // first, assign colors to vertices as desired
+//     for ( var i = 0; i < graphGeometry.vertices.length; i++ )
+//     {
+//         point = graphGeometry.vertices[ i ];
+//         color = new THREE.Color( 0x0000ff );
+//         color.setHSL( 0.7 * (zMax - point.z) / zRange, 1, 0.5 );
+//         graphGeometry.colors[i] = color; // use this array for convenience
+//     }
+//     // copy the colors as necessary to the face's vertexColors array.
+//     for ( var i = 0; i < graphGeometry.faces.length; i++ )
+//     {
+//         face = graphGeometry.faces[ i ];
+//         numberOfSides = ( face instanceof THREE.Face3 ) ? 3 : 4;
+//         for( var j = 0; j < numberOfSides; j++ )
+//         {
+//             vertexIndex = face[ faceIndices[ j ] ];
+//             face.vertexColors[ j ] = graphGeometry.colors[ vertexIndex ];
+//         }
+//     }
+//     ///////////////////////
+//     // end vertex colors //
+//     ///////////////////////
+//     var graphMesh = new THREE.Mesh( graphGeometry, material );
+//     graphMesh.doubleSided = true;
+//
+//     return graphMesh;
+
 };
 
 idv.vr.createTexture = function (data2D) {
@@ -187,7 +265,6 @@ idv.vr.createTexture = function (data2D) {
 idv.vr.createRenderer = function () {
     // renderer
     // RENDERER
-    this.renderer = new THREE.WebGLRenderer();
     renderer.setClearColor( 0xbfd1e5 );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize(window.innerWidth, window.innerHeight );
@@ -233,15 +310,13 @@ idv.vr.play = function () {
 
         data2D = idv.vr.generateHeight(idv.vr.getWorldWidth(), idv.vr.getWorldDepth());
 
+        // create renderer
+        idv.vr.createRenderer();
+
         // update camera position
         // position
         idv.vr.setupCamera();
 
-        controls.target.y = data2D[ worldHalfWidth + worldHalfDepth * worldWidth ] + 500;
-        camera.position.y =  controls.target.y + 2000;
-        camera.position.x = 2000;
-
-        // camera.position.y = data2D[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
 
         // create texture
         idv.vr.createTexture(data2D);
@@ -255,8 +330,8 @@ idv.vr.play = function () {
         idv.vr.mesh = idv.vr.createContourMesh(idv.vr.getWorldWidth(), idv.vr.getWorldDepth(), new THREE.MeshBasicMaterial( { map: idv.vr.getTexture() } ) , data2D);
         scene.add( idv.vr.getMesh() );
 
-        // create renderer
-        idv.vr.createRenderer();
+        scene.add( new THREE.AxisHelper() );
+
 
         // display
         idv.vr.attachDisplay();
