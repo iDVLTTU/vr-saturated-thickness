@@ -40,9 +40,9 @@ idv.vr.getWorldDepth = function () {
 };
 
 idv.vr.onWindowResize = function () {
-    this.camera.aspect = window.innerWidth / window.innerHeight;
-    this.camera.updateProjectionMatrix();
-    this.renderer.setSize( window.innerWidth, window.innerHeight );
+    idv.vr.camera.aspect = window.innerWidth / window.innerHeight;
+    idv.vr.camera.updateProjectionMatrix();
+    idv.vr.renderer.setSize( window.innerWidth, window.innerHeight );
 
     // controls.handleResize();
 };
