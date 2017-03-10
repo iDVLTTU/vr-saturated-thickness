@@ -51,14 +51,15 @@ idv.vr.setupCamera = function (data2D) {
     var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
     camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
     scene.add(camera);
-    camera.position.set(0,150,400);
-    camera.lookAt(scene.position);
-
-    camera.position.x = 2000;
-
+    camera.position.set(100,100,100);
+    // debugger;
+    camera.lookAt(new THREE.Vector3(0,0,0)); // origin
+    //
+    // camera.position.x = 2000;
+    //
     this.controls = new THREE.OrbitControls( camera );
-
-    camera.position.y =  idv.vr.controls.target.y + 2000;
+    //
+    // camera.position.y =  idv.vr.controls.target.y + 2000;
 
    // camera.position.y = data2D[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
 
@@ -72,8 +73,11 @@ idv.vr.setupCamera = function (data2D) {
     // this.controls.lookSpeed = 0.1;
 
     // orbit control
-    this.controls.target.set( 0.0, 100.0, 0.0 );
+   this.controls.target.set( 0.0, 0, 0.0 );
     this.controls.userPanSpeed = 100;
+
+    scene.add( new THREE.AxisHelper(50) );
+
 };
 
 idv.vr.render = function () {
@@ -111,10 +115,49 @@ idv.vr.attachStats = function () {
     container.appendChild( stats.dom );
 };
 
+idv.vr.createCuteGeometry = function () {
+    var vertices = [
+        new THREE.Vector3(1,3,1),
+        new THREE.Vector3(1,3,-1),
+        new THREE.Vector3(1,-1,1),
+        new THREE.Vector3(1,-1,-1),
+        new THREE.Vector3(-1,3,-1),
+        new THREE.Vector3(-1,3,1),
+        new THREE.Vector3(-1,-1,-1),
+        new THREE.Vector3(-1,-1,1)
+    ];
 
-idv.vr.createContourMesh = function (width, height, material, data2D) {
+    var faces = [
+        new THREE.Face3(0,2,1),
+        new THREE.Face3(2,3,1),
+        new THREE.Face3(4,6,5),
+        new THREE.Face3(6,7,5),
+        new THREE.Face3(4,5,1),
+        new THREE.Face3(5,0,1),
+        new THREE.Face3(7,6,2),
+        new THREE.Face3(6,3,2),
+        new THREE.Face3(5,7,0),
+        new THREE.Face3(7,2,0),
+        new THREE.Face3(1,3,4),
+        new THREE.Face3(3,6,4)
+    ];
+
+
+    var geometry = new THREE.Geometry();
+    geometry.vertices = vertices;
+    geometry.faces = faces;
+    geometry.computeBoundingBox();
+    // geometry.computeCentroids();
+    geometry.computeFaceNormals();
+    geometry.computeBoundingSphere();
+    // geometry.mergeVertices();
+
+    return geometry;
+};
+
+idv.vr.createTerrainGeometry = function () {
     var geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
-    geometry.rotateX( - Math.PI / 2 );
+    // geometry.rotateX( - Math.PI / 2 );
 
     var generateHeight = function ( width, height ) {
         var size = width * height,
@@ -139,6 +182,16 @@ idv.vr.createContourMesh = function (width, height, material, data2D) {
     for ( var i = 0, j = 0, l = vertices.length; i < l; i ++, j += 3 ) {
         vertices[ j + 1 ] = data[ i ] * 10;
     }
+
+    return geometry;
+
+
+};
+
+idv.vr.createContourMesh = function (width, height, material, data2D) {
+    var geometry = this.createCuteGeometry();
+
+
 
     return new THREE.Mesh( geometry, material );
 
@@ -330,7 +383,6 @@ idv.vr.play = function () {
         idv.vr.mesh = idv.vr.createContourMesh(idv.vr.getWorldWidth(), idv.vr.getWorldDepth(), new THREE.MeshBasicMaterial( { map: idv.vr.getTexture() } ) , data2D);
         scene.add( idv.vr.getMesh() );
 
-        scene.add( new THREE.AxisHelper() );
 
 
         // display
