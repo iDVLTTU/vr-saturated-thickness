@@ -20,7 +20,10 @@ idv.vr.init = function(){
 
         this.mesh = null;
 
-        return this;
+        this.textureLoader = new THREE.TextureLoader();
+
+
+    return this;
 };
 
 idv.vr.getTexture = function () {
@@ -53,7 +56,7 @@ idv.vr.setupCamera = function (data2D) {
     var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
     this.camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
     this.scene.add(this.camera);
-    this.camera.position.set(10,10,10);
+    this.camera.position.set(1000,1000,1000);
     // debugger;
     this.camera.lookAt(new THREE.Vector3(0,0,0)); // origin
     //
@@ -75,10 +78,17 @@ idv.vr.setupCamera = function (data2D) {
     // this.controls.lookSpeed = 0.1;
 
     // orbit control
-   this.controls.target.set( 0.0, 0, 0.0 );
     this.controls.userPanSpeed = 100;
 
-    this.scene.add( new THREE.AxisHelper(50) );
+    this.scene.add( new THREE.AxisHelper(1500) );
+
+    // LIGHT
+    // var light = new THREE.PointLight(0xffffff);
+    // light.position.set(0,25,0);
+    // this.scene.add(light);
+
+    var ambientLight = new THREE.AmbientLight(0x0c0c0c);
+    this.scene.add(ambientLight);
 
 };
 
@@ -118,82 +128,12 @@ idv.vr.attachStats = function () {
 };
 
 
-idv.vr.createContourMesh = function (width, height, material, data2D) {
-    var geometry = this.geo.createCuteGeometry();
-
-
-
-    return new THREE.Mesh( geometry, material );
-
-
-
-//     var zFuncText = "x^2 - y^2";
-//     var zFunc = Parser.parse(zFuncText).toJSFunction( ['x','y'] );
+// idv.vr.createContourMesh = function (width, height, material, data2D) {
 //
-// // parameters for the equations
-//     var a = 0.01, b = 0.01, c = 0.01, d = 0.01;
 //
-//     var meshFunction;
-//     var segments = 20,
-//         xMin = -10, xMax = 10, xRange = xMax - xMin,
-//         yMin = -10, yMax = 10, yRange = yMax - yMin,
-//         zMin = -10, zMax = 10, zRange = zMax - zMin;
 //
-//     xRange = xMax - xMin;
-//     yRange = yMax - yMin;
-//     zFunc = Parser.parse(zFuncText).toJSFunction( ['x','y'] );
-//     meshFunction = function(x, y)
-//     {
-//         x = xRange * x + xMin;
-//         y = yRange * y + yMin;
-//         var z = zFunc(x,y); //= Math.cos(x) * Math.sqrt(y);
-//         if ( isNaN(z) )
-//             return new THREE.Vector3(0,0,0); // TODO: better fix
-//         else
-//             return new THREE.Vector3(x, y, z);
-//     };
 //
-//     // true => sensible image tile repeat...
-//     var graphGeometry = new THREE.ParametricGeometry( meshFunction, segments, segments, true );
-//
-//     ///////////////////////////////////////////////
-//     // calculate vertex colors based on Z values //
-//     ///////////////////////////////////////////////
-//     graphGeometry.computeBoundingBox();
-//     zMin = graphGeometry.boundingBox.min.z;
-//     zMax = graphGeometry.boundingBox.max.z;
-//     zRange = zMax - zMin;
-//     var color, point, face, numberOfSides, vertexIndex;
-//     // faces are indexed using characters
-//     var faceIndices = [ 'a', 'b', 'c', 'd' ];
-//     // first, assign colors to vertices as desired
-//     for ( var i = 0; i < graphGeometry.vertices.length; i++ )
-//     {
-//         point = graphGeometry.vertices[ i ];
-//         color = new THREE.Color( 0x0000ff );
-//         color.setHSL( 0.7 * (zMax - point.z) / zRange, 1, 0.5 );
-//         graphGeometry.colors[i] = color; // use this array for convenience
-//     }
-//     // copy the colors as necessary to the face's vertexColors array.
-//     for ( var i = 0; i < graphGeometry.faces.length; i++ )
-//     {
-//         face = graphGeometry.faces[ i ];
-//         numberOfSides = ( face instanceof THREE.Face3 ) ? 3 : 4;
-//         for( var j = 0; j < numberOfSides; j++ )
-//         {
-//             vertexIndex = face[ faceIndices[ j ] ];
-//             face.vertexColors[ j ] = graphGeometry.colors[ vertexIndex ];
-//         }
-//     }
-//     ///////////////////////
-//     // end vertex colors //
-//     ///////////////////////
-//     var graphMesh = new THREE.Mesh( graphGeometry, material );
-//     graphMesh.doubleSided = true;
-//
-//     return graphMesh;
-
-};
+// };
 
 idv.vr.createTexture = function (data2D) {
     var generateTexture = function ( data, width, height ) {
@@ -240,17 +180,28 @@ idv.vr.createTexture = function (data2D) {
         return canvasScaled;
     };
 
-    this.texture = new THREE.CanvasTexture( generateTexture( data2D, idv.vr.getWorldWidth(), idv.vr.getWorldDepth() ) );
-    this.texture.wrapS = THREE.ClampToEdgeWrapping;
-    this.texture.wrapT = THREE.ClampToEdgeWrapping;
+    //this.texture = new THREE.CanvasTexture( generateTexture( data2D, idv.vr.getWorldWidth(), idv.vr.getWorldDepth() ) );
+    // this.texture.wrapS = THREE.RepeatWrapping;
+    // this.texture.wrapT = THREE.RepeatWrapping;
+    // this.texture.repeat.set( 40, 40 );
+
+
+    var wireTexture = idv.vr.texture;
+    wireTexture.wrapS = wireTexture.wrapT = THREE.MirroredRepeatWrapping;
+    wireTexture.repeat.set( 0.1, 0.1 );
+    // MirroredRepeatWrapping
+
 };
 
 idv.vr.createRenderer = function () {
     // renderer
     // RENDERER
-    this.renderer.setClearColor( 0xbfd1e5 );
+    // this.renderer.setClearColor( 0xbfd1e5 );
     this.renderer.setPixelRatio( window.devicePixelRatio );
     this.renderer.setSize(window.innerWidth, window.innerHeight );
+
+
+    this.renderer.setClearColor( 0x888888, 1 );
 
     // // LIGHT
     // var light = new THREE.PointLight(0xffffff);
@@ -269,57 +220,78 @@ idv.vr.attachDisplay = function () {
 
 idv.vr.play = function () {
     d3.csv("data/ascii_2013all.optimized-2-2.csv", function(error, pixelData) {
-        var pointId = 0;
-        var col = 0;
-        var index = 0;
-
-        var data2D = [];
-        for (var i=0;i<pixelData.length;i++){ // rows loop
-            var currentRow=[];
-            col = 0; // reset for column value
-            for (var key in pixelData[i]){ // columns loop
-                var cellValue = +pixelData[i][key];
-                currentRow.push(cellValue);
-                col ++;
-                index ++;
-                if (cellValue > -9999) {
-                    pointId ++; // current point id
-                }
-            }
-
-            data2D.push(currentRow);
-        }
+        // var pointId = 0;
+        // var col = 0;
+        // var index = 0;
+        //
+        // var data2D = [];
+        // for (var i=0;i<pixelData.length;i++){ // rows loop
+        //     var currentRow=[];
+        //     col = 0; // reset for column value
+        //     for (var key in pixelData[i]){ // columns loop
+        //         var cellValue = +pixelData[i][key];
+        //         currentRow.push(cellValue);
+        //         col ++;
+        //         index ++;
+        //         if (cellValue > -9999) {
+        //             pointId ++; // current point id
+        //         }
+        //     }
+        //
+        //     data2D.push(currentRow);
+        // }
 
 
         data2D = idv.vr.generateHeight(idv.vr.getWorldWidth(), idv.vr.getWorldDepth());
 
-        // create renderer
-        idv.vr.createRenderer();
-
-        // update camera position
-        // position
-        idv.vr.setupCamera();
 
 
-        // create texture
-        idv.vr.createTexture(data2D);
-
-        // create mesh
-
-        if (!!idv.vr.getMesh()) {
-            scene.remove( idv.vr.getMesh() );
-        }
-
-        idv.vr.mesh = idv.vr.createContourMesh(idv.vr.getWorldWidth(), idv.vr.getWorldDepth(), new THREE.MeshBasicMaterial( { map: idv.vr.getTexture(), vertexColors: THREE.VertexColors, side:THREE.DoubleSide } ) , data2D);
-        idv.vr.scene.add( idv.vr.getMesh() );
+        // loading texture
+        idv.vr.textureLoader.load('http://127.0.0.1:8080/media/brick_diffuse.jpg', function (wireTexture) {
+        // idv.vr.textureLoader.load('http://127.0.0.1:8080/media/square.png', function (wireTexture) {
 
 
+            idv.vr.texture  = wireTexture;
 
-        // display
-        idv.vr.attachDisplay();
+            // idv.vr.texture = texture1;
 
-        window.addEventListener( 'resize', idv.vr.onWindowResize, false );
-        idv.vr.animate();
+
+            // create renderer
+            idv.vr.createRenderer();
+
+            // update camera position
+            // position
+            idv.vr.setupCamera();
+
+
+            // create texture
+            idv.vr.createTexture(data2D);
+
+            // create mesh
+
+            if (!!idv.vr.getMesh()) {
+                idv.vr.scene.remove( idv.vr.getMesh() );
+            }
+
+            // var material = new THREE.MeshBasicMaterial( { color: 0x7777ff} );
+            // var material = new THREE.MeshLambertMaterial( { map: wireTexture} );
+            var material = new THREE.MeshBasicMaterial( { map: wireTexture} );
+
+            var geometry = idv.vr.geo.createCuteGeometry(material);
+            var boxGeometry = new THREE.BoxGeometry( 200, 200, 200 );
+
+            // idv.vr.mesh = idv.vr.createContourMesh(idv.vr.getWorldWidth(), idv.vr.getWorldDepth(), material , data2D);
+            idv.vr.mesh = new THREE.Mesh( geometry, material );
+            idv.vr.scene.add( idv.vr.getMesh() );
+
+
+
+            // display
+            idv.vr.attachDisplay();
+
+            window.addEventListener( 'resize', idv.vr.onWindowResize, false );
+            idv.vr.animate();
+        });
     });
 };
 
