@@ -63,29 +63,10 @@ idv.vr.setupCamera = function (data2D) {
     // camera.position.x = 2000;
     //
     this.controls = new THREE.OrbitControls( this.camera );
-    //
-    // camera.position.y =  idv.vr.controls.target.y + 2000;
-
-   // camera.position.y = data2D[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
-
-    // track ball control
-    // this.controls = new THREE.TrackballControls( camera, renderer.domElement );
-
-
-    // first personc ontrol
-    // this.controls = new THREE.FirstPersonControls( camera );
-    // this.controls.movementSpeed = 1000;
-    // this.controls.lookSpeed = 0.1;
-
     // orbit control
     this.controls.userPanSpeed = 100;
 
     this.scene.add( new THREE.AxisHelper(1500) );
-
-    // LIGHT
-    // var light = new THREE.PointLight(0xffffff);
-    // light.position.set(0,25,0);
-    // this.scene.add(light);
 
     var ambientLight = new THREE.AmbientLight(0x0c0c0c);
     this.scene.add(ambientLight);
@@ -180,12 +161,6 @@ idv.vr.createTexture = function (data2D) {
         return canvasScaled;
     };
 
-    //this.texture = new THREE.CanvasTexture( generateTexture( data2D, idv.vr.getWorldWidth(), idv.vr.getWorldDepth() ) );
-    // this.texture.wrapS = THREE.RepeatWrapping;
-    // this.texture.wrapT = THREE.RepeatWrapping;
-    // this.texture.repeat.set( 40, 40 );
-
-
     var wireTexture = idv.vr.texture;
     wireTexture.wrapS = wireTexture.wrapT = THREE.MirroredRepeatWrapping;
     wireTexture.repeat.set( 0.1, 0.1 );
@@ -220,41 +195,14 @@ idv.vr.attachDisplay = function () {
 
 idv.vr.play = function () {
     d3.csv("data/ascii_2013all.optimized-2-2.csv", function(error, pixelData) {
-        // var pointId = 0;
-        // var col = 0;
-        // var index = 0;
-        //
-        // var data2D = [];
-        // for (var i=0;i<pixelData.length;i++){ // rows loop
-        //     var currentRow=[];
-        //     col = 0; // reset for column value
-        //     for (var key in pixelData[i]){ // columns loop
-        //         var cellValue = +pixelData[i][key];
-        //         currentRow.push(cellValue);
-        //         col ++;
-        //         index ++;
-        //         if (cellValue > -9999) {
-        //             pointId ++; // current point id
-        //         }
-        //     }
-        //
-        //     data2D.push(currentRow);
-        // }
-
 
         data2D = idv.vr.generateHeight(idv.vr.getWorldWidth(), idv.vr.getWorldDepth());
-
-
 
         // loading texture
         idv.vr.textureLoader.load('http://127.0.0.1:8080/media/brick_diffuse.jpg', function (wireTexture) {
         // idv.vr.textureLoader.load('http://127.0.0.1:8080/media/square.png', function (wireTexture) {
 
-
             idv.vr.texture  = wireTexture;
-
-            // idv.vr.texture = texture1;
-
 
             // create renderer
             idv.vr.createRenderer();
@@ -262,7 +210,6 @@ idv.vr.play = function () {
             // update camera position
             // position
             idv.vr.setupCamera();
-
 
             // create texture
             idv.vr.createTexture(data2D);
@@ -273,14 +220,9 @@ idv.vr.play = function () {
                 idv.vr.scene.remove( idv.vr.getMesh() );
             }
 
-            // var material = new THREE.MeshBasicMaterial( { color: 0x7777ff} );
-            // var material = new THREE.MeshLambertMaterial( { map: wireTexture} );
             var material = new THREE.MeshBasicMaterial( { map: wireTexture} );
 
             var geometry = idv.vr.geo.createCuteGeometry(material);
-            var boxGeometry = new THREE.BoxGeometry( 200, 200, 200 );
-
-            // idv.vr.mesh = idv.vr.createContourMesh(idv.vr.getWorldWidth(), idv.vr.getWorldDepth(), material , data2D);
             idv.vr.mesh = new THREE.Mesh( geometry, material );
             idv.vr.scene.add( idv.vr.getMesh() );
 

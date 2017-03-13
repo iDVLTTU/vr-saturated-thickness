@@ -81,14 +81,6 @@ idv.vr.geo.createCuteGeometry = function (material) {
     var water = [new THREE.Vector2(0, 0), new THREE.Vector2(.5, 0), new THREE.Vector2(.5, .333), new THREE.Vector2(0, .333)];
     var wood = [new THREE.Vector2(.5, 0), new THREE.Vector2(1, 0), new THREE.Vector2(1, .333), new THREE.Vector2(.5, .333)];
 
-    var bricks = [
-        new THREE.Vector2(0, .666),
-        new THREE.Vector2(.5, .666),
-        new THREE.Vector2(.5, 1),
-        new THREE.Vector2(0, 1)
-    ];
-
-
     geometry.faceVertexUvs[0] = [];
 
     geometry.faceVertexUvs[0][0] = [ bricks[0], bricks[1], bricks[3] ];
