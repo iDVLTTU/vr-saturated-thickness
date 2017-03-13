@@ -194,6 +194,8 @@ idv.vr.geo.createGraphGeometry = function (data2D, material) {
             myZ = 0;
         }
 
+        myZ = myZ / 10;
+
         return new THREE.Vector3(myX, myY, myZ);
     };
 
@@ -214,11 +216,30 @@ idv.vr.geo.createGraphGeometry = function (data2D, material) {
     // faces are indexed using characters
     var faceIndices = [ 'a', 'b', 'c', 'd' ];
     // first, assign colors to vertices as desired
+
     for ( var i = 0; i < graphGeometry.vertices.length; i++ )
     {
         point = graphGeometry.vertices[ i ];
-        color = new THREE.Color( 0x0000ff );
-        color.setHSL( 0.7 * (zMax - point.z) / zRange, 1, 0.5 );
+        color = new THREE.Color( 0xFF0000 );
+
+        if (point.z < 25) {
+            color.setHSL( 0.1, 1, 0.5 );
+
+        }
+        else if (point.z < 50) {
+            color.setHSL(0.3, 1, 0.5 );
+
+        }
+        else if (point.z < 90) {
+            color.setHSL(0.5, 1, 0.5 );
+
+        }
+        else {
+            color.setHSL(0.7, 1, 0.5 );
+
+        }
+
+        // color.setHSL( 0.7 * (zMax - point.z) / zRange, 1, 0.5 );
         graphGeometry.colors[i] = color; // use this array for convenience
     }
     // copy the colors as necessary to the face's vertexColors array.
