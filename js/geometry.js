@@ -2,8 +2,87 @@ var idv = idv || {};
 idv.vr = idv.vr || {};
 idv.vr.geo = idv.vr.geo || {};
 
-
 idv.vr.geo.createCuteGeometry = function (material) {
+
+    var cube = new THREE.CubeGeometry( 200, 200, 200 );
+
+    return cube;
+};
+
+idv.vr.geo.createTextureForGeometry = function (geometry) {
+
+
+    // mapping UV to support custom texture
+    var bricks = [new THREE.Vector2(0, .666), new THREE.Vector2(.5, .666), new THREE.Vector2(.5, 1), new THREE.Vector2(0, 1)];
+    var clouds = [new THREE.Vector2(.5, .666), new THREE.Vector2(1, .666), new THREE.Vector2(1, 1), new THREE.Vector2(.5, 1)];
+    var crate = [new THREE.Vector2(0, .333), new THREE.Vector2(.5, .333), new THREE.Vector2(.5, .666), new THREE.Vector2(0, .666)];
+    var stone = [new THREE.Vector2(.5, .333), new THREE.Vector2(1, .333), new THREE.Vector2(1, .666), new THREE.Vector2(.5, .666)];
+    var water = [new THREE.Vector2(0, 0), new THREE.Vector2(.5, 0), new THREE.Vector2(.5, .333), new THREE.Vector2(0, .333)];
+    var wood = [new THREE.Vector2(.5, 0), new THREE.Vector2(1, 0), new THREE.Vector2(1, .333), new THREE.Vector2(.5, .333)];
+
+    geometry.faceVertexUvs[0] = [];
+
+    geometry.faceVertexUvs[0][0] = [ bricks[0], bricks[1], bricks[3] ];
+    geometry.faceVertexUvs[0][1] = [ bricks[1], bricks[2], bricks[3] ];
+
+    geometry.faceVertexUvs[0][2] = [ clouds[0], clouds[1], clouds[3] ];
+    geometry.faceVertexUvs[0][3] = [ clouds[1], clouds[2], clouds[3] ];
+
+    geometry.faceVertexUvs[0][4] = [ crate[0], crate[1], crate[3] ];
+    geometry.faceVertexUvs[0][5] = [ crate[1], crate[2], crate[3] ];
+
+    geometry.faceVertexUvs[0][6] = [ stone[0], stone[1], stone[3] ];
+    geometry.faceVertexUvs[0][7] = [ stone[1], stone[2], stone[3] ];
+
+    geometry.faceVertexUvs[0][8] = [ water[0], water[1], water[3] ];
+    geometry.faceVertexUvs[0][9] = [ water[1], water[2], water[3] ];
+
+    geometry.faceVertexUvs[0][10] = [ wood[0], wood[1], wood[3] ];
+    geometry.faceVertexUvs[0][11] = [ wood[1], wood[2], wood[3] ];
+
+    geometry.uvsNeedUpdate = true;
+
+    return geometry;
+
+};
+
+idv.vr.geo.createTextureVertexColorForGeometry = function (geometry) {
+    var zMin = geometry.boundingBox.min.z;
+    var zMax = geometry.boundingBox.max.z;
+    var zRange = zMax - zMin;
+    var color, point, face, numberOfSides, vertexIndex;
+    // faces are indexed using characters
+    var faceIndices = [ 'a', 'b', 'c', 'd' ];
+    // first, assign colors to vertices as desired
+    for ( var i = 0; i < geometry.vertices.length; i++ )
+    {
+        point = geometry.vertices[ i ];
+        color = new THREE.Color( 0x0000ff );
+        color.setHSL( 0.7 * (zMax - point.z) / zRange, 1, 0.5 );
+        geometry.colors[i] = color; // use this array for convenience
+    }
+
+    var colors = [];
+    colors.push(new THREE.Color(0xFF0000));
+    colors.push(new THREE.Color(0x00FF00));
+    colors.push(new THREE.Color(0x0000FF));
+    // copy the colors as necessary to the face's vertexColors array.
+    for ( var i = 0; i < geometry.faces.length; i++ )
+    {
+        face = geometry.faces[ i ];
+        numberOfSides = ( face instanceof THREE.Face3 ) ? 3 : 4;
+        for( var j = 0; j < numberOfSides; j++ )
+        {
+            vertexIndex = face[ faceIndices[ j ] ];
+            // face.vertexColors[ j ] = geometry.colors[ vertexIndex ];
+            face.vertexColors[ j ] = colors[j%3];
+        }
+    }
+
+    return geometry;
+};
+
+idv.vr.geo.createMyCuteGeometry = function (material) {
     var vertices = [
         new THREE.Vector3(100,300,100),
         new THREE.Vector3(100,300,-100),
@@ -41,70 +120,9 @@ idv.vr.geo.createCuteGeometry = function (material) {
     geometry.rotateX( - Math.PI / 2 );
 
 
-    var zMin = geometry.boundingBox.min.z;
-    var zMax = geometry.boundingBox.max.z;
-    var zRange = zMax - zMin;
-    var color, point, face, numberOfSides, vertexIndex;
-    // faces are indexed using characters
-    var faceIndices = [ 'a', 'b', 'c', 'd' ];
-    // first, assign colors to vertices as desired
-    for ( var i = 0; i < geometry.vertices.length; i++ )
-    {
-        point = geometry.vertices[ i ];
-        color = new THREE.Color( 0x0000ff );
-        color.setHSL( 0.7 * (zMax - point.z) / zRange, 1, 0.5 );
-        geometry.colors[i] = color; // use this array for convenience
-    }
-
-    var colors = [];
-    colors.push(new THREE.Color(0xFF0000));
-    colors.push(new THREE.Color(0x00FF00));
-    colors.push(new THREE.Color(0x0000FF));
-    // copy the colors as necessary to the face's vertexColors array.
-    for ( var i = 0; i < geometry.faces.length; i++ )
-    {
-        face = geometry.faces[ i ];
-        numberOfSides = ( face instanceof THREE.Face3 ) ? 3 : 4;
-        for( var j = 0; j < numberOfSides; j++ )
-        {
-            vertexIndex = face[ faceIndices[ j ] ];
-            // face.vertexColors[ j ] = geometry.colors[ vertexIndex ];
-            face.vertexColors[ j ] = colors[j%3];
-        }
-    }
-
-    // mapping UV to support custom texture
-    var bricks = [new THREE.Vector2(0, .666), new THREE.Vector2(.5, .666), new THREE.Vector2(.5, 1), new THREE.Vector2(0, 1)];
-    var clouds = [new THREE.Vector2(.5, .666), new THREE.Vector2(1, .666), new THREE.Vector2(1, 1), new THREE.Vector2(.5, 1)];
-    var crate = [new THREE.Vector2(0, .333), new THREE.Vector2(.5, .333), new THREE.Vector2(.5, .666), new THREE.Vector2(0, .666)];
-    var stone = [new THREE.Vector2(.5, .333), new THREE.Vector2(1, .333), new THREE.Vector2(1, .666), new THREE.Vector2(.5, .666)];
-    var water = [new THREE.Vector2(0, 0), new THREE.Vector2(.5, 0), new THREE.Vector2(.5, .333), new THREE.Vector2(0, .333)];
-    var wood = [new THREE.Vector2(.5, 0), new THREE.Vector2(1, 0), new THREE.Vector2(1, .333), new THREE.Vector2(.5, .333)];
-
-    geometry.faceVertexUvs[0] = [];
-
-    geometry.faceVertexUvs[0][0] = [ bricks[0], bricks[1], bricks[3] ];
-    geometry.faceVertexUvs[0][1] = [ bricks[1], bricks[2], bricks[3] ];
-
-    geometry.faceVertexUvs[0][2] = [ clouds[0], clouds[1], clouds[3] ];
-    geometry.faceVertexUvs[0][3] = [ clouds[1], clouds[2], clouds[3] ];
-
-    geometry.faceVertexUvs[0][4] = [ crate[0], crate[1], crate[3] ];
-    geometry.faceVertexUvs[0][5] = [ crate[1], crate[2], crate[3] ];
-
-    geometry.faceVertexUvs[0][6] = [ stone[0], stone[1], stone[3] ];
-    geometry.faceVertexUvs[0][7] = [ stone[1], stone[2], stone[3] ];
-
-    geometry.faceVertexUvs[0][8] = [ water[0], water[1], water[3] ];
-    geometry.faceVertexUvs[0][9] = [ water[1], water[2], water[3] ];
-
-    geometry.faceVertexUvs[0][10] = [ wood[0], wood[1], wood[3] ];
-    geometry.faceVertexUvs[0][11] = [ wood[1], wood[2], wood[3] ];
-
-    geometry.uvsNeedUpdate = true;
 
 
-    return geometry;
+    return this.createTextureVertexColorForGeometry(geometry);
 };
 
 

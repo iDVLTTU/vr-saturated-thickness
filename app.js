@@ -199,8 +199,8 @@ idv.vr.play = function () {
         data2D = idv.vr.generateHeight(idv.vr.getWorldWidth(), idv.vr.getWorldDepth());
 
         // loading texture
-        idv.vr.textureLoader.load('http://127.0.0.1:8080/media/brick_diffuse.jpg', function (wireTexture) {
-        // idv.vr.textureLoader.load('http://127.0.0.1:8080/media/square.png', function (wireTexture) {
+        // idv.vr.textureLoader.load('http://127.0.0.1:8080/media/brick_diffuse.jpg', function (wireTexture) {
+            idv.vr.textureLoader.load('http://127.0.0.1:8080/media/square.png', function (wireTexture) {
 
             idv.vr.texture  = wireTexture;
 
@@ -220,9 +220,11 @@ idv.vr.play = function () {
                 idv.vr.scene.remove( idv.vr.getMesh() );
             }
 
-            var material = new THREE.MeshBasicMaterial( { map: wireTexture} );
+            var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
+            // var material = new THREE.MeshBasicMaterial( { map: wireTexture } );
 
-            var geometry = idv.vr.geo.createCuteGeometry(material);
+            // var geometry = idv.vr.geo.createCuteGeometry(material);
+            var geometry = idv.vr.geo.createMyCuteGeometry(material);
             idv.vr.mesh = new THREE.Mesh( geometry, material );
             idv.vr.scene.add( idv.vr.getMesh() );
 
