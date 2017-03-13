@@ -223,8 +223,8 @@ idv.vr.play = function () {
             var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
             // var material = new THREE.MeshBasicMaterial( { map: wireTexture } );
 
-            // var geometry = idv.vr.geo.createCuteGeometry(material);
-            var geometry = idv.vr.geo.createMyCuteGeometry(material);
+            var geometry = idv.vr.geo.createCuteGeometry(material);
+            // var geometry = idv.vr.geo.createMyCuteGeometry(material);
             idv.vr.mesh = new THREE.Mesh( geometry, material );
             idv.vr.scene.add( idv.vr.getMesh() );
 

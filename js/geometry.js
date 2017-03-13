@@ -5,8 +5,9 @@ idv.vr.geo = idv.vr.geo || {};
 idv.vr.geo.createCuteGeometry = function (material) {
 
     var cube = new THREE.CubeGeometry( 200, 200, 200 );
+    cube.computeBoundingBox();
 
-    return cube;
+    return this.createTextureVertexColorForGeometry(cube);
 };
 
 idv.vr.geo.createTextureForGeometry = function (geometry) {
