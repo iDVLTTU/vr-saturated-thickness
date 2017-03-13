@@ -117,53 +117,11 @@ idv.vr.attachStats = function () {
 // };
 
 idv.vr.createTexture = function (data2D) {
-    var generateTexture = function ( data, width, height ) {
-        var canvas, canvasScaled, context, image, imageData,
-            level, diff, vector3, sun, shade;
-        vector3 = new THREE.Vector3( 0, 0, 0 );
-        sun = new THREE.Vector3( 1, 1, 1 );
-        sun.normalize();
-        canvas = document.createElement( 'canvas' );
-        canvas.width = width;
-        canvas.height = height;
-        context = canvas.getContext( '2d' );
-        context.fillStyle = '#000';
-        context.fillRect( 0, 0, width, height );
-        image = context.getImageData( 0, 0, canvas.width, canvas.height );
-        imageData = image.data;
-        for ( var i = 0, j = 0, l = imageData.length; i < l; i += 4, j ++ ) {
-            vector3.x = data[ j - 2 ] - data[ j + 2 ];
-            vector3.y = 2;
-            vector3.z = data[ j - width * 2 ] - data[ j + width * 2 ];
-            vector3.normalize();
-            shade = vector3.dot( sun );
-            imageData[ i ] = ( 96 + shade * 128 ) * ( 0.5 + data[ j ] * 0.007 );
-            imageData[ i + 1 ] = ( 32 + shade * 96 ) * ( 0.5 + data[ j ] * 0.007 );
-            imageData[ i + 2 ] = ( shade * 96 ) * ( 0.5 + data[ j ] * 0.007 );
-        }
-        context.putImageData( image, 0, 0 );
-        // Scaled 4x
-        canvasScaled = document.createElement( 'canvas' );
-        canvasScaled.width = width * 4;
-        canvasScaled.height = height * 4;
-        context = canvasScaled.getContext( '2d' );
-        context.scale( 4, 4 );
-        context.drawImage( canvas, 0, 0 );
-        image = context.getImageData( 0, 0, canvasScaled.width, canvasScaled.height );
-        imageData = image.data;
-        for ( var i = 0, l = imageData.length; i < l; i += 4 ) {
-            var v = ~~ ( Math.random() * 5 );
-            imageData[ i ] += v;
-            imageData[ i + 1 ] += v;
-            imageData[ i + 2 ] += v;
-        }
-        context.putImageData( image, 0, 0 );
-        return canvasScaled;
-    };
+
 
     var wireTexture = idv.vr.texture;
     wireTexture.wrapS = wireTexture.wrapT = THREE.MirroredRepeatWrapping;
-    wireTexture.repeat.set( 0.1, 0.1 );
+    wireTexture.repeat.set( 40, 40 );
     // MirroredRepeatWrapping
 
 };
@@ -196,7 +154,26 @@ idv.vr.attachDisplay = function () {
 idv.vr.play = function () {
     d3.csv("data/ascii_2013all.optimized-2-2.csv", function(error, pixelData) {
 
-        data2D = idv.vr.generateHeight(idv.vr.getWorldWidth(), idv.vr.getWorldDepth());
+        var pointId = 0;
+        var col = 0;
+        var index = 0;
+        var data2D = [];
+
+        for (var i=0;i<pixelData.length - 19;i++){ // rows loop
+            var currentRow=[];
+            col = 0; // reset for column value
+            for (var key in pixelData[i]){ // columns loop
+                var cellValue = pixelData[i][key];
+                currentRow.push(cellValue);
+                col ++;
+                index ++;
+                if (cellValue > -9999) {
+                    pointId ++; // current point id
+                }
+            }
+
+            data2D.push(currentRow);
+        }
 
         // loading texture
         // idv.vr.textureLoader.load('http://127.0.0.1:8080/media/brick_diffuse.jpg', function (wireTexture) {
@@ -220,10 +197,11 @@ idv.vr.play = function () {
                 idv.vr.scene.remove( idv.vr.getMesh() );
             }
 
-            var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
+            var material = new THREE.MeshBasicMaterial( { map: wireTexture, vertexColors: THREE.VertexColors,  side:THREE.DoubleSide,  wireframe: false, overdraw: true  } );
             // var material = new THREE.MeshBasicMaterial( { map: wireTexture } );
 
-            var geometry = idv.vr.geo.createCuteGeometry(material);
+            var geometry = idv.vr.geo.createGraphGeometry(data2D, material);
+            // var geometry = idv.vr.geo.createCuteGeometry(material);
             // var geometry = idv.vr.geo.createMyCuteGeometry(material);
             idv.vr.mesh = new THREE.Mesh( geometry, material );
             idv.vr.scene.add( idv.vr.getMesh() );

@@ -129,7 +129,7 @@ idv.vr.geo.createMyCuteGeometry = function (material) {
 
 
 
-idv.vr.createTerrainGeometry = function () {
+idv.vr.geo.createTerrainGeometry = function () {
     var geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
     // geometry.rotateX( - Math.PI / 2 );
 
@@ -162,36 +162,46 @@ idv.vr.createTerrainGeometry = function () {
 
 };
 
-idv.vr.createGraphGeometry = function () {
+idv.vr.geo.createGraphGeometry = function (data2D, material) {
 
     var zFuncText = "x^2 - y^2";
     var zFunc = Parser.parse(zFuncText).toJSFunction( ['x','y'] );
 
 // parameters for the equations
-    var a = 0.01, b = 0.01, c = 0.01, d = 0.01;
+//     var a = 0.01, b = 0.01, c = 0.01, d = 0.01;
 
     var meshFunction;
-    var segments = 20,
-        xMin = -10, xMax = 10, xRange = xMax - xMin,
-        yMin = -10, yMax = 10, yRange = yMax - yMin,
-        zMin = -10, zMax = 10, zRange = zMax - zMin;
+    var segments = 5,
+        zMin = -10,
+        zMax = 10;
 
-    xRange = xMax - xMin;
-    yRange = yMax - yMin;
-    zFunc = Parser.parse(zFuncText).toJSFunction( ['x','y'] );
+    var zRange = zMax - zMin;
+    var segmentRow = data2D.length-1;
+    var segmentCol = data2D[0].length-1;
+
     meshFunction = function(x, y)
     {
-        x = xRange * x + xMin;
-        y = yRange * y + yMin;
-        var z = zFunc(x,y); //= Math.cos(x) * Math.sqrt(y);
-        if ( isNaN(z) )
-            return new THREE.Vector3(0,0,0); // TODO: better fix
-        else
-            return new THREE.Vector3(x, y, z);
+        var myX = Math.round(x * segmentRow);
+        var myY = Math.round(y * segmentCol);
+
+        var tmpZ = data2D[myX];
+        if (tmpZ == undefined) {
+            debugger;
+        }
+        var myZ = tmpZ[myY];
+
+        if (myZ < 0) {
+            myZ = 0;
+        }
+
+        return new THREE.Vector3(myX, myY, myZ);
     };
 
     // true => sensible image tile repeat...
-    var graphGeometry = new THREE.ParametricGeometry( meshFunction, segments, segments, true );
+    var graphGeometry = new THREE.ParametricGeometry( meshFunction, segmentRow-1, segmentCol-1, false );
+
+    // graphGeometry.rotateX( - Math.PI / 2 );
+
 
     ///////////////////////////////////////////////
     // calculate vertex colors based on Z values //
@@ -225,8 +235,6 @@ idv.vr.createGraphGeometry = function () {
     ///////////////////////
     // end vertex colors //
     ///////////////////////
-    var graphMesh = new THREE.Mesh( graphGeometry, material );
-    graphMesh.doubleSided = true;
 
-    return graphMesh;
+    return graphGeometry;
 };
