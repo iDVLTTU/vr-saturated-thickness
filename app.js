@@ -191,8 +191,14 @@ idv.vr.play = function () {
             // create texture
             idv.vr.createTexture(data2D);
 
-            // create mesh
 
+            // SKYBOX
+            var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
+            var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );
+            var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
+            idv.vr.scene.add(skyBox);
+
+            // create mesh
             if (!!idv.vr.getMesh()) {
                 idv.vr.scene.remove( idv.vr.getMesh() );
             }
@@ -210,6 +216,23 @@ idv.vr.play = function () {
 
             // display
             idv.vr.attachDisplay();
+
+
+            // var gridXZ = new THREE.GridHelper(100, 10);
+            var gridXZ = new THREE.GridHelper(1000, 10, new THREE.Color(0x006600), new THREE.Color(0x006600));
+            gridXZ.position.set( 100, -400, 100 );
+            idv.vr.scene.add(gridXZ);
+
+            var gridXY = new THREE.GridHelper(1000, 10, new THREE.Color(0x000066), new THREE.Color(0x000066));
+            gridXY.position.set( 100, 100, -400 );
+            gridXY.rotation.x = Math.PI/2;
+            idv.vr.scene.add(gridXY);
+
+
+            var gridYZ = new THREE.GridHelper(1000, 10, new THREE.Color(0x660000), new THREE.Color(0x660000));
+            gridYZ.position.set( -400, 100, 100 );
+            gridYZ.rotation.z = Math.PI/2;
+            idv.vr.scene.add(gridYZ);
 
             window.addEventListener( 'resize', idv.vr.onWindowResize, false );
             idv.vr.animate();
