@@ -135,7 +135,8 @@ idv.vr.attachDisplay = function () {
 
 
 idv.vr.play = function () {
-    d3.csv("data/ascii_2013all.optimized-2-2.csv", function(error, pixelData) {
+    d3.csv("data/ascii_2013all.original.csv", function(error, pixelData) {
+    // d3.csv("data/ascii_2013all.optimized-2-2.csv", function(error, pixelData) {
 
         var pointId = 0;
         var col = 0;
@@ -148,19 +149,19 @@ idv.vr.play = function () {
             for (var key in pixelData[i]){ // columns loop
                 var cellValue = pixelData[i][key];
                 currentRow.push(cellValue);
-                col ++;
-                index ++;
-                if (cellValue > -9999) {
-                    pointId ++; // current point id
-                }
+                // col ++;
+                // index ++;
+                // if (cellValue > -9999) {
+                //     pointId ++; // current point id
+                // }
             }
 
             data2D.push(currentRow);
         }
 
         // loading texture
-        // idv.vr.textureLoader.load('http://127.0.0.1:8080/media/brick_diffuse.jpg', function (wireTexture) {
-            idv.vr.textureLoader.load('http://127.0.0.1:8080/media/square.png', function (wireTexture) {
+        idv.vr.textureLoader.load('http://127.0.0.1:8080/media/brick_diffuse.jpg', function (wireTexture) {
+            // idv.vr.textureLoader.load('http://127.0.0.1:8080/media/square.png', function (wireTexture) {
 
             idv.vr.texture  = wireTexture;
 
@@ -186,12 +187,10 @@ idv.vr.play = function () {
                 idv.vr.scene.remove( idv.vr.getMesh() );
             }
 
-            var material = new THREE.MeshBasicMaterial( { map: wireTexture, vertexColors: THREE.VertexColors,  side:THREE.DoubleSide,  wireframe: false, overdraw: true  } );
-            // var material = new THREE.MeshBasicMaterial( { map: wireTexture } );
+            var material = new THREE.MeshBasicMaterial( { map: wireTexture, vertexColors: THREE.VertexColors,  side:THREE.DoubleSide,  wireframe: false } );
+            // var material = new THREE.MeshBasicMaterial( { color: 0xff0077 } );
 
-            var geometry = idv.vr.geo.createGraphGeometry(data2D, material);
-            // var geometry = idv.vr.geo.createCuteGeometry(material);
-            // var geometry = idv.vr.geo.createMyCuteGeometry(material);
+            var geometry = idv.vr.geo.createOgallalaGeometry(data2D, material);
             idv.vr.mesh = new THREE.Mesh( geometry, material );
             idv.vr.scene.add( idv.vr.getMesh() );
 
@@ -200,22 +199,6 @@ idv.vr.play = function () {
             // display
             idv.vr.attachDisplay();
 
-
-            // var gridXZ = new THREE.GridHelper(100, 10);
-            var gridXZ = new THREE.GridHelper(1000, 10, new THREE.Color(0x006600), new THREE.Color(0x006600));
-            gridXZ.position.set( 100, -400, 100 );
-            idv.vr.scene.add(gridXZ);
-
-            var gridXY = new THREE.GridHelper(1000, 10, new THREE.Color(0x000066), new THREE.Color(0x000066));
-            gridXY.position.set( 100, 100, -400 );
-            gridXY.rotation.x = Math.PI/2;
-            idv.vr.scene.add(gridXY);
-
-
-            var gridYZ = new THREE.GridHelper(1000, 10, new THREE.Color(0x660000), new THREE.Color(0x660000));
-            gridYZ.position.set( -400, 100, 100 );
-            gridYZ.rotation.z = Math.PI/2;
-            idv.vr.scene.add(gridYZ);
 
             window.addEventListener( 'resize', idv.vr.onWindowResize, false );
             idv.vr.animate();
