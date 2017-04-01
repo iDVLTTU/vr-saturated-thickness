@@ -5,7 +5,7 @@ https://github.com/iDataVisualizationLab/SaturatedThickness
 
 ## DEMO
 
-https://idatavisualizationlab.github.io/vr-saturated-thickness/
+https://idvlttu.github.io/vr-saturated-thickness/
 
 ## REFERENCE
 
