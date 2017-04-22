@@ -10,7 +10,7 @@ var views, glScene, glRenderer, camera, cssrenderer;
 var cssScene, cssRenderer;
 
 var light;
-
+var effect;
 var mouseX = 0, mouseY = 0;
 
 var windowWidth =  window.innerWidth,
@@ -411,6 +411,7 @@ function init() {
     glRenderer.setClearColor("#FFFFFF");
     glRenderer.setSize( windowWidth, windowHeight);
     container.appendChild( glRenderer.domElement );
+    effect = new THREE.StereoEffect(glRenderer);
 
 //----------------------------------------------------------------------------
 //    SET UP STATS
@@ -441,7 +442,9 @@ function animate() {
 
 function render() {
     camera.lookAt( glScene.position );
-    glRenderer.render( glScene, camera );
+    // glRenderer.render( glScene, camera );
+    effect.render(glScene, camera);
+
     stats.update();
 
 }
@@ -456,6 +459,8 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
 
     glRenderer.setSize( windowWidth, windowHeight );
+    effect.setSize(width, height);
+
     render();
 
 }
