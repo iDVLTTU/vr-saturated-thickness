@@ -1,11 +1,8 @@
-An implementaion of 3D saturated thickness visualization.
+An implementaion of 3D saturated thickness visualization: https://idatavisualizationlab.github.io/SaturatedThickness_3D/
 
 The project is based on its earlier 2D version:
 https://github.com/iDataVisualizationLab/SaturatedThickness
 
-## DEMO
-
-https://iDataVisualizationLab.github.io/vr-saturated-thickness/
 
 ## REFERENCE
 
